@@ -51,7 +51,72 @@ class Person():
 
 
 class Population():
-    pass
+    """Controls the simulation of an multiple person objects."""
+
+    def __init__(self, simulation):
+        """Initialize attributes"""
+        self.population = []
+        # Creates a person based on simulation conditions
+        for i in range(simulation.population_size):
+            person = Person()
+            self.population.append(person)
+
+    def initial_infection(self, simulation):
+        """Initially infects an  portion of the population."""
+        infected_count = int(round(simulation.infection_percent*simulation.population_size, 0))
+        for i in range(infected_count):
+            self.population[i].is_infected = True
+            self.population[i].days_infected = 1
+        random.shuffle(self.population)
+
+    def spread_infection(self, simulation):
+        """Spreads infection to adjacent persons of population."""
+        # only left-right 2D Line
+        for i in range(len(self.population)):
+            if self.population[i].is_dead == False:
+                # i-th person is first, can check to right only
+                if i == 0:
+                    if self.population[i+1].is_infected:
+                        self.population[i].infect(simulation)
+                # i-th person is middle, can check to left and right
+                elif i < len(self.population)-1:
+                    if self.population[i+1].is_infected:
+                        if self.population[i-1].is_infected or self.population[i+1].is_infected:
+                            self.population[i].infect(simulation)
+                # i-th person is last, can check to left only
+                elif i == len(self.population)-1:
+                    if self.population[i-1].is_infected:
+                        self.population[i].infect(simulation)
+
+    def update(self, simulation):
+        """Update the entire population by updating the persons individually"""
+        simulation.day_number += 1
+
+        for person in self.population:
+            person.update(simulation)
+
+    def display_stats(self, simulation):
+        """Display the current statistics"""
+        total_infected_count = 0
+        total_death_count = 0
+
+        for person in self.population:
+            if person.is_infected:
+                total_infected_count += 1
+                if person.is_dead:
+                    total_death_count += 1
+
+        infected_percent = round((total_infected_count/simulation.population_size)*100, 4)
+        death_percent = round((total_death_count/simulation.population_size)*100, 4)
+
+        print(f"\n-----DAY #{simulation.day_number}-----")
+        print(f"Percentage of Population Infected: {infected_percent}")
+        print(f"Percentage of Population Dead: {death_percent}")
+        print(f"Total Infected {total_infected_count}/{simulation.population_size}")
+        print(f"Total Death {total_death_count}/{simulation.population_size}")
+
+    def graphics():
+        pass
 
 
 sim = Simulation()
