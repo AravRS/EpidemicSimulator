@@ -8,12 +8,14 @@ class Simulation():
     def __init__(self):
         """Initialize attributes"""
         self.day_number = 1
-        self.population_size = int(input(">Enter the population size: "))
-        self.infection_percent = float(input(">Enter the percentage (0-100) of the population to initially infect: "))/100
-        self.infection_probability = float(input(">Enter the probability (0-100) that a person gets infected when exposed to the disease: "))
-        self.infection_duration = int(input(">Enter the duration (in days) of the infection: "))
-        self.mortality_rate = float(input(">Enter the mortality rate (0-100) of the infection: "))
-        self.sim_days = int(input(">Enter the number of days to simulate: "))
+        print("\n---------EPIDEMIC SIMULATOR TERMINAL APP---------")
+        print("People arranged in a line, i.e 1D\n")
+        self.population_size = int(input("> Enter the population size: "))
+        self.infection_percent = float(input("> Enter the percentage (0-100) of the population to initially infect: "))/100
+        self.infection_probability = float(input("> Enter the probability (0-100) that a person gets infected when exposed to the disease: "))
+        self.infection_duration = int(input("> Enter the duration (in days) of the infection to last: "))
+        self.mortality_rate = float(input("> Enter the mortality rate (0-100) of the infection: "))
+        self.sim_days = int(input("> Enter the number of days to simulate: "))
 
 
 class Person():
@@ -62,7 +64,7 @@ class Population():
             self.population.append(person)
 
     def initial_infection(self, simulation):
-        """Initially infects an  portion of the population."""
+        """Initially infects a portion of the population."""
         infected_count = int(round(simulation.infection_percent*simulation.population_size, 0))
         for i in range(infected_count):
             self.population[i].is_infected = True
@@ -70,7 +72,7 @@ class Population():
         random.shuffle(self.population)
 
     def spread_infection(self, simulation):
-        """Spreads infection to adjacent persons of population."""
+        """Spreads infection to adjacent 1D array of persons in population."""
         # only left-right 2D Line
         for i in range(len(self.population)):
             if self.population[i].is_dead == False:
@@ -88,14 +90,14 @@ class Population():
                         self.population[i].infect(simulation)
 
     def update(self, simulation):
-        """Update the entire population by updating the persons individually"""
+        """Update the entire population by updating the persons individually."""
         simulation.day_number += 1
 
         for person in self.population:
             person.update(simulation)
 
     def display_stats(self, simulation):
-        """Display the current statistics"""
+        """Display the current statistics."""
         total_infected_count = 0
         total_death_count = 0
 
@@ -111,11 +113,11 @@ class Population():
         print(f"\n-----DAY #{simulation.day_number}-----")
         print(f"Percentage of Population Infected: {infected_percent}%")
         print(f"Percentage of Population Dead: {death_percent}%")
-        print(f"Total Infected {total_infected_count} / {simulation.population_size}")
-        print(f"Total Death {total_death_count} / {simulation.population_size}")
+        print(f"Total Infected: {total_infected_count} / {simulation.population_size}")
+        print(f"Total Dead: {total_death_count} / {simulation.population_size}")
 
     def graphics(self):
-        """A graphical representation of our population. O  healthy, I  infected, X dead"""
+        """A graphical representation of our population. O  healthy, I  infected, X dead."""
         status = []
         for person in self.population:
             if person.is_dead:
