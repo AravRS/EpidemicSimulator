@@ -80,9 +80,8 @@ class Population():
                         self.population[i].infect(simulation)
                 # i-th person is middle, can check to left and right
                 elif i < len(self.population)-1:
-                    if self.population[i+1].is_infected:
-                        if self.population[i-1].is_infected or self.population[i+1].is_infected:
-                            self.population[i].infect(simulation)
+                    if self.population[i-1].is_infected or self.population[i+1].is_infected:
+                        self.population[i].infect(simulation)
                 # i-th person is last, can check to left only
                 elif i == len(self.population)-1:
                     if self.population[i-1].is_infected:
@@ -110,13 +109,42 @@ class Population():
         death_percent = round((total_death_count/simulation.population_size)*100, 4)
 
         print(f"\n-----DAY #{simulation.day_number}-----")
-        print(f"Percentage of Population Infected: {infected_percent}")
-        print(f"Percentage of Population Dead: {death_percent}")
-        print(f"Total Infected {total_infected_count}/{simulation.population_size}")
-        print(f"Total Death {total_death_count}/{simulation.population_size}")
+        print(f"Percentage of Population Infected: {infected_percent}%")
+        print(f"Percentage of Population Dead: {death_percent}%")
+        print(f"Total Infected {total_infected_count} / {simulation.population_size}")
+        print(f"Total Death {total_death_count} / {simulation.population_size}")
 
-    def graphics():
-        pass
+    def graphics(self):
+        """A graphical representation of our population. O  healthy, I  infected, X dead"""
+        status = []
+        for person in self.population:
+            if person.is_dead:
+                char = "X"
+            else:
+                if person.is_infected:
+                    char = "I"
+                else:
+                    char = "O"
+            status.append(char)
+
+        for letter in status:
+            print(letter, end="-")
 
 
+# Main code
 sim = Simulation()
+pop = Population(sim)
+
+pop.initial_infection(sim)
+pop.display_stats(sim)
+pop.graphics()
+input("\nPress Enter to begin the simulation.")
+
+for i in range(1, sim.sim_days):
+    pop.spread_infection(sim)
+    pop.update(sim)
+    pop.display_stats(sim)
+    pop.graphics()
+
+    # if i != sim.sim_days-1:
+    #     input("\Press Enter to  advance to the next day.")
