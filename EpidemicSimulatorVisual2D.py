@@ -1,6 +1,7 @@
-# Epidemic Simulator Terminal App
+# Epidemic Simulator Visual App
 import random
 import math
+import tkinter
 
 
 class Simulation():
@@ -9,7 +10,7 @@ class Simulation():
     def __init__(self):
         """Initialize attributes"""
         self.day_number = 1
-        print("\n---------EPIDEMIC SIMULATOR TERMINAL APP---------")
+        print("\n---------EPIDEMIC SIMULATOR VISUAL APP---------")
         print("People arranged in a plane, i.e 2D\n")
         self.population_size = int(input("> Enter the population size: "))
 
@@ -158,43 +159,53 @@ class Population():
         print(f"Total Infected: {total_infected_count} / {simulation.population_size}")
         print(f"Total Dead: {total_death_count} / {simulation.population_size}")
 
-    def graphics(self):
-        """A graphical representation of our population. O  healthy, I  infected, X dead."""
-        status = []
-        for row in self.population:
-            temp = []
-            for person in row:
-                if person.is_dead:
-                    char = "X"
-                else:
-                    if person.is_infected:
-                        char = "I"
-                    else:
-                        char = "O"
-                temp.append(char)
-            status.append(temp)
 
-        for row in status:
-            for letter in row:
-                print(letter, end=" ")
-            print("")
-        # print(status)
+def tkgraphics(simulation, population, canvas):
+    """Helper function to update the tkinter display"""
+    # Get individual squares for each person
+    gui_window_size = 600
+    square_dimension = gui_window_size//simulation.grid_size
+
+    # Dimension for each person
+    for i in range(simulation.grid_size):
+        y = i*square_dimension
+        for j in range(simulation.grid_size):
+            x = j*square_dimension
+
+            # colors
+            if population.population[i][j].is_dead:
+                canvas.create_rectangle(x, y, x+square_dimension, y+square_dimension, fill='red')
+            else:
+                if population.population[i][j].is_infected:
+                    canvas.create_rectangle(x, y, x+square_dimension, y+square_dimension, fill='yellow')
+                else:
+                    canvas.create_rectangle(x, y, x+square_dimension, y+square_dimension, fill='green')
 
 
 # Main code
 sim = Simulation()
-pop = Population(sim)
 
+# tkinter
+WINDOW_WIDTH = WINDOW_HEIGHT = 600
+
+sim_window = tkinter.Tk()
+sim_window.title("Epidemic Simulator")
+sim_canvas = tkinter.Canvas(sim_window, width=WINDOW_WIDTH, height=WINDOW_HEIGHT, bg='white')
+sim_canvas.pack(side=tkinter.LEFT)
+
+pop = Population(sim)
 pop.initial_infection(sim)
 pop.display_stats(sim)
-pop.graphics()
 input("\nPress Enter to begin the simulation.")
 
 for i in range(1, sim.sim_days):
     pop.spread_infection(sim)
     pop.update(sim)
     pop.display_stats(sim)
-    pop.graphics()
 
-    # if i != sim.sim_days-1:
-    #     input("\Press Enter to  advance to the next day.")
+    tkgraphics(sim, pop, sim_canvas)
+    sim_window.update()
+    if i != sim.sim_days-1:
+        sim_canvas.delete('all')
+    elif i == sim.sim_days-1:
+        input("Simulation Ended.")
